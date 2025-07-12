@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Remote Access Pro | Rahul Parmar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 20px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+    }
+
+    input {
+      width: 85%;
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+    }
+
+    button {
+      background-color: #0f0;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    canvas {
+      margin-top: 20px;
+      border: 2px solid #0f0;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+    }
+
+    #qrcode-section {
+      margin-top: 20px;
+    }
+
+    a.download-btn {
+      display: inline-block;
+      margin-top: 10px;
+      color: #0ff;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff;
+    }
+
+    h1 {
+      text-shadow: 0 0 10px #0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 Remote Access QR Generator Pro</h1>
+
+  <input type="text" id="linkInput" placeholder="🔗 Enter remote access link (https://...)"><br>
+  <input type="password" id="otpInput" placeholder="🔑 Optional OTP / password"><br>
+  <button onclick="generateQRCode()">⚙️ Generate QR</button>
+
+  <div id="qrcode-section">
+    <div id="qrcode"></div>
+    <a id="downloadBtn" class="download-btn" style="display:none;">⬇️ Download QR Image</a><br>
+    <button id="copyBtn" style="display:none;" onclick="copyLink()">📋 Copy Link</button>
+    <button id="whatsappBtn" style="display:none;" onclick="sendWhatsApp()">📤 Send on WhatsApp</button>
+  </div>
+
+  <footer>Created by Rahul Parmar</footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script>
+    let globalLink = '';
+
+    function generateQRCode() {
+      const link = document.getElementById("linkInput").value;
+      const otp = document.getElementById("otpInput").value;
+
+      if (!link || !link.startsWith("http")) {
+        alert("❗ Please enter a valid link starting with http or https.");
+        return;
+      }
+
+      globalLink = otp ? `${link}?otp=${encodeURIComponent(otp)}` : link;
+
+      const qr = new QRious({
+        element: document.createElement('canvas'),
+        value: globalLink,
+        size: 250,
+      });
+
+      const qrcodeDiv = document.getElementById("qrcode");
+      qrcodeDiv.innerHTML = '';
+      qrcodeDiv.appendChild(qr.element);
+
+      // Download button
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.href = qr.toDataURL();
+      downloadBtn.download = "remote-access-qr.png";
+      downloadBtn.style.display = "inline-block";
+
+      // Show other buttons
+      document.getElementById("copyBtn").style.display = "inline-block";
+      document.getElementById("whatsappBtn").style.display = "inline-block";
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(globalLink).then(() => {
+        alert("✅ Link copied to clipboard!");
+      });
+    }
+
+    function sendWhatsApp() {
+      const message = encodeURIComponent("📡 Remote Access Link:\n" + globalLink);
+      const waURL = `https://wa.me/?text=${message}`;
+      window.open(waURL, "_blank");
+    }
+  </script>
+</body>
+</html>
